@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TextTitle">
+        <item name="fontFamily">@font/roboto_bold</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextTitle.00">
+        <item name="android:textSize">26dp</item>
+    </style>
+
+    <style name="TextSubTitle">
+        <item name="fontFamily">@font/roboto_medium</item>
+        <item name="fontWeight">500</item>
+    </style>
+
+    <style name="TextSubTitle.01">
+        <item name="android:textSize">18dp</item>
+    </style>
+
+    <style name="TextBodyMedium">
+        <item name="fontFamily">@font/roboto_medium</item>
+        <item name="fontWeight">500</item>
+    </style>
+
+    <style name="TextBodyMedium.01">
+        <item name="android:textSize">16dp</item>
+    </style>
+
+
+    <style name="TextBodyRegular">
+        <item name="fontFamily">@font/roboto_regular</item>
+        <item name="fontWeight">400</item>
+    </style>
+
+    <style name="TextBodyRegular.01">
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <style name="TextBodyRegular.02">
+        <item name="android:textSize">24dp</item>
+    </style>
+
+    <style name="TextBodyRegular.03">
+        <item name="android:textSize">32dp</item>
+    </style>
+
+
+</resources>
