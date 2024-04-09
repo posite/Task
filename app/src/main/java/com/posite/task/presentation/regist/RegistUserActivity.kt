@@ -1,38 +1,28 @@
 package com.posite.task.presentation.regist
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.content.Context
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.posite.task.R
 import com.posite.task.databinding.ActivityRegistUserBinding
 import com.posite.task.presentation.base.BaseActivity
-import com.posite.task.presentation.regist.vm.RegistUserViewModelImpl
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Calendar
 
 @AndroidEntryPoint
 class RegistUserActivity :
-    BaseActivity<RegistUserViewModelImpl, ActivityRegistUserBinding>(R.layout.activity_regist_user) {
-    override val viewModel: RegistUserViewModelImpl by viewModels<RegistUserViewModelImpl>()
+    BaseActivity<ActivityRegistUserBinding>(R.layout.activity_regist_user) {
 
     override fun initView() {
-        binding.birthdayEdit.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-            DatePickerDialog(this, AlertDialog.THEME_HOLO_LIGHT, { _, cYear, cMonth, cDay ->
-                run {
-                    binding.birthdayEdit.text =
-                        getString(R.string.birthday_format, cYear, cMonth + 1, cDay)
-                }
-            }, year, month, day).show()
-        }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        val navController = navHostFragment.findNavController()
+        navController.navInflater.inflate(R.navigation.regist_graph).apply {
+            //setStartDestination(R.id.SplashFragment)
+        }.run { navController.setGraph(this, null) }
     }
 
     override fun initObserver() {

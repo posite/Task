@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/regist_graph"
+    app:startDestination="@id/registFragment">
+
+    <fragment
+        android:id="@+id/registFragment"
+        android:name="com.posite.task.presentation.regist.RegistFragment"
+        tools:layout="@layout/fragment_regist"
+        android:label="RegistFragment">
+
+        <action
+            android:id="@+id/action_registFragment_to_finishRegistFragment"
+            app:destination="@id/finishRegistFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/finishRegistFragment"
+        tools:layout="@layout/fragment_finish_regist"
+        android:name="com.posite.task.presentation.regist.FinishRegistFragment"
+        android:label="FinishRegistFragment">
+
+
+        <argument
+            android:name="userInfo"
+            app:argType="com.posite.task.presentation.model.UserInfo" />
+    </fragment>
+</navigation>

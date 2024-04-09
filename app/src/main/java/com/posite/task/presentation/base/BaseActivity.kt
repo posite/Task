@@ -6,11 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 
-abstract class BaseActivity<vm : BaseViewModel?, V : ViewDataBinding>(@LayoutRes val layoutResource: Int) :
+abstract class BaseActivity<V : ViewDataBinding>(@LayoutRes val layoutResource: Int) :
     AppCompatActivity() {
-
-    abstract val viewModel: vm?
-
     private var _binding: V? = null
     protected val binding: V get() = _binding!!
     abstract fun initView()
