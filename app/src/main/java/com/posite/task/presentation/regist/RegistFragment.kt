@@ -1,6 +1,7 @@
 package com.posite.task.presentation.regist
 
 import android.app.DatePickerDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,10 +40,9 @@ class RegistFragment :
     override fun initView() {
         binding.viewModel = viewModel
         binding.birthdayEdit.setOnClickListener {
-
             val dialog = DatePickerDialog(
                 requireContext(),
-                android.R.style.Theme_DeviceDefault_Light_Dialog,
+                R.style.MySpinnerDatePickerStyle,
                 { _, cYear, cMonth, cDay ->
                     run {
                         if (cMonth < 10 && cDay < 10) {
@@ -87,7 +87,12 @@ class RegistFragment :
                 month,
                 day
             )
+            val color = ContextCompat.getColor(requireActivity(), R.color.highlight)
             dialog.show()
+            dialog.getButton(DatePickerDialog.BUTTON_POSITIVE)
+                .setTextColor(color)
+            dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE)
+                .setTextColor(color)
         }
     }
 

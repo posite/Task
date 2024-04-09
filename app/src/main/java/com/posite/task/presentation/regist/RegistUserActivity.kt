@@ -21,7 +21,6 @@ class RegistUserActivity :
             supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         val navController = navHostFragment.findNavController()
         navController.navInflater.inflate(R.navigation.regist_graph).apply {
-            //setStartDestination(R.id.SplashFragment)
         }.run { navController.setGraph(this, null) }
     }
 
