@@ -47,8 +47,20 @@ class RegistFragment :
             }
         }
 
+    //bitmap으로 바로 넣기
+    private val getTakePicturePreview =
+        registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            bitmap?.let {
+                pictureBitmap = it
+                binding.profileImageFrame.setImageBitmap(bitmap)
+                binding.profileImageFrame.setPadding(0, 0, 0, 0)
+            }
+        }
+
     private var pictureUri: Uri? = null
     private var pictureBitmap: Bitmap? = null
+
+    //uri 저장
     private val getTakePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) {
         if (it) {
             pictureUri?.let {
@@ -62,29 +74,14 @@ class RegistFragment :
 
     override fun onResume() {
         super.onResume()
-        pictureUri?.let {
-            //binding.profileImageFrame.setImageURI(pictureUri)
-            pictureBitmap = uriToBitmap(pictureUri!!)
-            binding.profileImageFrame.setImageBitmap(pictureBitmap)
+        pictureBitmap?.let {
+            binding.profileImageFrame.setImageBitmap(it)
             binding.profileImageFrame.setPadding(0, 0, 0, 0)
         }
     }
 
     override fun initObserver() {
-//        lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.userInfo.collect {
-//                    Log.d("userInfo", it.toString())
-//                    if (!userInfoObserved && it.name.isNotBlank() && it.birthday.isNotBlank() && pictureUri != null) {
-//                        val action =
-//                            RegistFragmentDirections.actionRegistFragmentToFinishRegistFragment(
-//                                it
-//                            )
-//                        this@RegistFragment.findNavController().navigate(action)
-//                    }
-//                }
-//            }
-//        }
+
     }
 
     override fun initView() {
@@ -112,7 +109,8 @@ class RegistFragment :
 
         binding.profileImageFrame.setOnClickListener {
             pictureUri = createImageFile()
-            getTakePicture.launch(pictureUri)
+            getTakePicturePreview.launch(null)
+            //getTakePicture.launch(pictureUri)
 
         }
     }
