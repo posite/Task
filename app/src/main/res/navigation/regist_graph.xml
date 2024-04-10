@@ -13,14 +13,14 @@
 
         <action
             android:id="@+id/action_registFragment_to_finishRegistFragment"
-            app:destination="@id/finishRegistFragment" />
+            app:destination="@id/finishRegistFragment"
+            app:popUpTo="@id/finishRegistFragment" />
     </fragment>
     <fragment
         android:id="@+id/finishRegistFragment"
         tools:layout="@layout/fragment_finish_regist"
         android:name="com.posite.task.presentation.regist.FinishRegistFragment"
         android:label="FinishRegistFragment">
-
 
         <argument
             android:name="userInfo"

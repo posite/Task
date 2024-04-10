@@ -4,6 +4,5 @@
     <string name="birthday_hint">Birthday</string>
     <string name="register_btn">Register</string>
     <string name="birthday_format">"%d.%s.%s"</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="finish_regist_btn">Start</string>
 </resources>
