@@ -60,7 +60,7 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
         setProfile()
         binding.taskRv.adapter = taskAdapter
         binding.taskRv.layoutManager = LinearLayoutManager(this)
-        
+
 
 
         binding.addBtn.setOnClickListener {
@@ -95,7 +95,7 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.taskList.collect {
-                    taskAdapter.submitList(it)
+                    taskAdapter.submitList(it.sortedBy { task -> task.date })
                 }
             }
         }
