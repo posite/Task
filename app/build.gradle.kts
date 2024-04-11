@@ -72,8 +72,4 @@ dependencies {
 
     //lifecycle
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-
-    //circleimageview
-    implementation("de.hdodenhof:circleimageview:3.1.0")
-
 }

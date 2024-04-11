@@ -24,6 +24,6 @@
 
         <argument
             android:name="userInfo"
-            app:argType="com.posite.task.presentation.model.UserInfo" />
+            app:argType="com.posite.task.presentation.regist.model.UserInfo" />
     </fragment>
 </navigation>

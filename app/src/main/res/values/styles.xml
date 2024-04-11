@@ -29,14 +29,22 @@
         <item name="android:textSize">16dp</item>
     </style>
 
+    <style name="TextBodyMedium.02">
+        <item name="android:textSize">12dp</item>
+    </style>
+
 
     <style name="TextBodyRegular">
         <item name="fontFamily">@font/roboto_regular</item>
         <item name="fontWeight">400</item>
     </style>
 
-    <style name="TextBodyRegular.01">
+    <style name="TextBodyRegular.00">
         <item name="android:textSize">16dp</item>
+    </style>
+
+    <style name="TextBodyRegular.01">
+        <item name="android:textSize">20dp</item>
     </style>
 
     <style name="TextBodyRegular.02">
@@ -47,5 +55,8 @@
         <item name="android:textSize">32dp</item>
     </style>
 
+    <style name="TextBodyRegular.04">
+        <item name="android:textSize">12dp</item>
+    </style>
 
 </resources>

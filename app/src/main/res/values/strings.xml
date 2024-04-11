@@ -5,4 +5,12 @@
     <string name="register_btn">Register</string>
     <string name="birthday_format">"%d.%s.%s"</string>
     <string name="finish_regist_btn">Start</string>
+    <string name="todo_title">TODO LIST</string>
+    <string name="task_hint">Task</string>
+    <string name="date_hint">Date</string>
+    <string name="task_format">"yyyy MM/dd hh:mm a"</string>
+    <string name="add_task_title">ADD TASK</string>
+    <string name="add_btn">ADD</string>
+    <string name="edit_task_title">EDIT TASK</string>
+    <string name="edit_btn">EDIT</string>
 </resources>

@@ -9,6 +9,7 @@ import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -16,7 +17,7 @@ import androidx.navigation.fragment.findNavController
 import com.posite.task.R
 import com.posite.task.databinding.FragmentRegistBinding
 import com.posite.task.presentation.base.BaseFragment
-import com.posite.task.presentation.model.UserInfo
+import com.posite.task.presentation.regist.model.UserInfo
 import com.posite.task.presentation.regist.vm.RegistUserViewModelImpl
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
@@ -50,6 +51,7 @@ class RegistFragment :
     //bitmap으로 바로 넣기
     private val getTakePicturePreview =
         registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            Log.d("bitmap", bitmap.toString())
             bitmap?.let {
                 pictureBitmap = it
                 binding.profileImageFrame.setImageBitmap(bitmap)
@@ -104,6 +106,8 @@ class RegistFragment :
                         UserInfo(name, birthday, pictureBitmap!!)
                     )
                 this@RegistFragment.findNavController().navigate(action)
+            } else {
+                Toast.makeText(requireContext(), "모든 정보를 입력해주세요", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -111,7 +115,6 @@ class RegistFragment :
             pictureUri = createImageFile()
             getTakePicturePreview.launch(null)
             //getTakePicture.launch(pictureUri)
-
         }
     }
 

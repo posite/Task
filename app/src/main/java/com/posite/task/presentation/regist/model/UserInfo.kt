@@ -1,4 +1,4 @@
-package com.posite.task.presentation.model
+package com.posite.task.presentation.regist.model
 
 import android.graphics.Bitmap
 import android.os.Parcelable

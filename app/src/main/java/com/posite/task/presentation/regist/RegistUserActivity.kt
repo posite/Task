@@ -18,7 +18,7 @@ class RegistUserActivity :
 
     override fun initView() {
         val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+            supportFragmentManager.findFragmentById(R.id.regist_nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.findNavController()
         navController.navInflater.inflate(R.navigation.regist_graph).apply {
         }.run { navController.setGraph(this, null) }
