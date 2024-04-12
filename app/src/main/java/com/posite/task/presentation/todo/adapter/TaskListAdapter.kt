@@ -1,6 +1,7 @@
 package com.posite.task.presentation.todo.adapter
 
 import android.icu.text.SimpleDateFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -12,13 +13,14 @@ import com.posite.task.databinding.ItemTaskBinding
 import com.posite.task.presentation.todo.model.UserTask
 import java.util.Locale
 
-class TaskListAdapter(private val editTask: (UserTask) -> Unit) :
+class TaskListAdapter(val editTask: (UserTask) -> Unit, val removeTask: (UserTask) -> Unit) :
     ListAdapter<UserTask, TaskListAdapter.ItemViewHolder>(differ) {
 
     inner class ItemViewHolder(
         private val binding: ItemTaskBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(data: UserTask) {
+            Log.d("task_id", data.taskId.toString())
             binding.userTaskTitle.text = data.taskTitle
             binding.userTaskDate.text = DATE_FORMATTER.format(data.date)
         }
@@ -37,21 +39,8 @@ class TaskListAdapter(private val editTask: (UserTask) -> Unit) :
         )
     }
 
-    fun getLastItem(): UserTask = getItem(itemCount - 1)
-
-    fun getCurrentItem(index: Int): UserTask = getItem(index)
-
-    fun removeItem(index: Int) {
-        val currentList = currentList.toMutableList()
-        currentList.removeAt(index)
-        submitList(currentList)
-    }
-
-    fun restoreItem(index: Int, data: UserTask) {
-        val currentList = currentList.toMutableList()
-        currentList.add(index, data)
-        submitList(currentList)
-    }
+    fun onItemMoved(index: Int): UserTask = getItem(index)
+    fun lastId(): Long = currentList.maxBy { it.taskId }.taskId
 
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {

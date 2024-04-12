@@ -12,12 +12,14 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.textfield.TextInputEditText
 import com.posite.task.R
 import com.posite.task.databinding.ActivityTaskBinding
 import com.posite.task.presentation.base.BaseActivity
 import com.posite.task.presentation.regist.model.UserInfo
+import com.posite.task.presentation.todo.adapter.SwipeCallback
 import com.posite.task.presentation.todo.adapter.TaskListAdapter
 import com.posite.task.presentation.todo.model.UserTask
 import com.posite.task.presentation.todo.vm.TaskViewModel
@@ -30,9 +32,15 @@ import java.util.Date
 class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
     private val viewModel: TaskViewModel by viewModels<TaskViewModelImpl>()
     private val taskAdapter by lazy {
-        TaskListAdapter {
+        TaskListAdapter(editTask = {
+            val intent = Intent(this, EditTaskActivity::class.java)
+            intent.putExtra("user_task", it)
+            intent.putExtra("edit_type", EDIT_TYPE_EDIT)
+            activityResultLauncher.launch(intent)
+        }, removeTask = {
+            viewModel.removeTask(it)
 
-        }
+        })
     }
 
     private val activityResultLauncher: ActivityResultLauncher<Intent> =
@@ -41,9 +49,9 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
                 val taskIntent = it.data
                 try {
                     val userTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        taskIntent!!.getParcelableExtra("userTask", UserTask::class.java)
+                        taskIntent!!.getParcelableExtra("user_task", UserTask::class.java)
                     } else {
-                        taskIntent!!.getParcelableExtra<UserTask>("userTask")
+                        taskIntent!!.getParcelableExtra<UserTask>("user_task")
                     }
                     userTask?.let { task ->
                         viewModel.addTask(task)
@@ -61,17 +69,18 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
         binding.taskRv.adapter = taskAdapter
         binding.taskRv.layoutManager = LinearLayoutManager(this)
 
-
+        val itemTouchHelper = ItemTouchHelper(SwipeCallback(this, taskAdapter))
+        itemTouchHelper.attachToRecyclerView(binding.taskRv)
 
         binding.addBtn.setOnClickListener {
             val intent = Intent(this, EditTaskActivity::class.java)
             if (taskAdapter.itemCount != 0) {
                 intent.putExtra(
-                    "userTask",
-                    UserTask(taskAdapter.getLastItem().taskId + 1, "", Date(), false)
+                    "user_task",
+                    UserTask(taskAdapter.lastId() + 1, "", Date(), false)
                 )
             } else {
-                intent.putExtra("userTask", UserTask(1, "", Date(), false))
+                intent.putExtra("user_task", UserTask(1, "", Date(), false))
             }
             intent.putExtra("edit_type", EDIT_TYPE_ADD)
             activityResultLauncher.launch(intent)

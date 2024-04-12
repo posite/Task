@@ -7,4 +7,5 @@ interface TaskViewModel {
     val taskList: StateFlow<List<UserTask>>
 
     fun addTask(task: UserTask)
+    fun removeTask(task: UserTask)
 }

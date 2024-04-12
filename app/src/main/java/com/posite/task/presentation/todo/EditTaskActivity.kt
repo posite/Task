@@ -32,9 +32,9 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
 
     override fun initView() {
         val task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("userTask", UserTask::class.java)
+            intent.getParcelableExtra("user_task", UserTask::class.java)
         } else {
-            intent.getParcelableExtra<UserTask>("userTask")
+            intent.getParcelableExtra<UserTask>("user_task")
         }
         val type = intent.getStringExtra("edit_type")
 
@@ -42,24 +42,24 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
             when (type) {
                 "add" -> {
                     editTaskTitle.text = getString(R.string.add_task_title)
-                    fishEditBtn.text = getString(R.string.add_btn)
+                    finishEditBtn.text = getString(R.string.add_btn)
                 }
 
                 "edit" -> {
                     editTaskTitle.text = getString(R.string.edit_task_title)
                     taskEdit.setText(task!!.taskTitle)
-                    fishEditBtn.text = getString(R.string.edit_btn)
+                    finishEditBtn.text = getString(R.string.edit_btn)
                     dateEdit.text = task.date.toString()
                 }
             }
-            fishEditBtn.setOnClickListener {
+            finishEditBtn.setOnClickListener {
                 val taskContent = taskEdit.text
                 val taskDate = dateEdit.text
                 if (taskContent.isNullOrBlank().not() && taskDate.isNullOrBlank().not()) {
                     val intent = Intent(this@EditTaskActivity, TaskActivity::class.java)
                     if (task != null) {
                         intent.putExtra(
-                            "userTask",
+                            "user_task",
                             UserTask(
                                 task.taskId,
                                 taskContent.toString(),
@@ -70,7 +70,7 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
 
                     } else {
                         intent.putExtra(
-                            "userTask",
+                            "user_task",
                             UserTask(1, taskContent.toString(), calendar.time, false)
                         )
                     }

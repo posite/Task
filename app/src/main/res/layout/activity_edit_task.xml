@@ -59,7 +59,7 @@
             app:layout_constraintTop_toBottomOf="@id/task_edit" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/fish_edit_btn"
+            android:id="@+id/finish_edit_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
