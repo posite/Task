@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
+import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.ActivityResultLauncher
@@ -55,6 +56,7 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
     private val activityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val taskIntent = it.data
+            Log.d("code", it.resultCode.toString())
             try {
                 val userTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     taskIntent!!.getParcelableExtra("user_task", UserTask::class.java)
@@ -67,10 +69,10 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
                     }
                 } else if (it.resultCode == 1) {
                     userTask?.let { task ->
-                        taskAdapter.removeTask(userTask)
                         viewModel.addTask(task)
                     }
                 } else if (it.resultCode == 2) {
+
                     swipeCallback.undoSwipe()
                 }
 

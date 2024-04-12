@@ -27,14 +27,14 @@ class SwipeCallback(
         val targetItem = adapter.onItemMoved(targetIndex)
         recentlySwipedItem = Pair(targetIndex, targetItem)
         if (direction == ItemTouchHelper.LEFT) {
-            //adapter.removeTask(targetItem)
+            adapter.removeTask(targetItem)
             adapter.editTask(targetItem)
+
         } else if (direction == ItemTouchHelper.RIGHT) {
             adapter.removeTask(targetItem)
-
+            showUndoAddSnackbar()
         }
 
-        showUndoSnackbar()
     }
 
     override fun onMove(
@@ -77,7 +77,7 @@ class SwipeCallback(
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
-    private fun showUndoSnackbar() {
+    private fun showUndoAddSnackbar() {
         val snackbar = Snackbar.make(context, recyclerView, "Task 완료됨", Snackbar.LENGTH_LONG)
         snackbar.setAction("Undo") {
             // Undo 버튼을 누르면 실행되는 작업
