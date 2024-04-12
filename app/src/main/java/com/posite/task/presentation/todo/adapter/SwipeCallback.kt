@@ -4,14 +4,17 @@ import android.content.Context
 import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.posite.task.R
+import com.posite.task.presentation.todo.model.UserTask
 
 class SwipeCallback(
     val context: Context,
+    private val recyclerView: RecyclerView,
     private val adapter: TaskListAdapter
 ) : ItemTouchHelper.Callback() {
 
-
+    private var recentlySwipedItem: Pair<Int, UserTask>? = null
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
@@ -22,14 +25,16 @@ class SwipeCallback(
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         val targetIndex = viewHolder.adapterPosition
         val targetItem = adapter.onItemMoved(targetIndex)
-
+        recentlySwipedItem = Pair(targetIndex, targetItem)
         if (direction == ItemTouchHelper.LEFT) {
-            adapter.removeTask(targetItem)
+            //adapter.removeTask(targetItem)
             adapter.editTask(targetItem)
         } else if (direction == ItemTouchHelper.RIGHT) {
             adapter.removeTask(targetItem)
 
         }
+
+        showUndoSnackbar()
     }
 
     override fun onMove(
@@ -70,5 +75,21 @@ class SwipeCallback(
             }
         }
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+    }
+
+    private fun showUndoSnackbar() {
+        val snackbar = Snackbar.make(context, recyclerView, "Task 완료됨", Snackbar.LENGTH_LONG)
+        snackbar.setAction("Undo") {
+            // Undo 버튼을 누르면 실행되는 작업
+            recentlySwipedItem?.let { (index, item) ->
+                adapter.addTask(item) // 이전에 swipe한 아이템을 다시 추가
+                recyclerView.scrollToPosition(index) // 아이템이 추가된 위치로 스크롤
+                recentlySwipedItem = null // 임시 저장된 아이템 초기화
+            }
+        }
+        snackbar.setBackgroundTint(context.getColor(R.color.white))
+        snackbar.setTextColor(context.getColor(R.color.highlight))
+        snackbar.setActionTextColor(context.getColor(R.color.highlight))
+        snackbar.show()
     }
 }

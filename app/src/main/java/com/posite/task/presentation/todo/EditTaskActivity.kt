@@ -1,37 +1,43 @@
 package com.posite.task.presentation.todo
 
-import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.icu.text.SimpleDateFormat
 import android.os.Build
-import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
+import androidx.activity.OnBackPressedCallback
 import com.google.android.material.textfield.TextInputEditText
 import com.posite.task.R
 import com.posite.task.TaskApplication
 import com.posite.task.databinding.ActivityEditTaskBinding
 import com.posite.task.presentation.base.BaseActivity
+import com.posite.task.presentation.todo.dialog.DateDialog
 import com.posite.task.presentation.todo.model.UserTask
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 import java.util.Locale
 
 @AndroidEntryPoint
-class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity_edit_task) {
+class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity_edit_task),
+    DateDialog.OnInputListener {
     private var calendar = Calendar.getInstance()
-    private var year = calendar.get(Calendar.YEAR)
-    private var month = calendar.get(Calendar.MONTH)
-    private var day = calendar.get(Calendar.DAY_OF_MONTH)
+    private var task: UserTask? = null
+
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+
+        }
+    }
+
     override fun initObserver() {
 
     }
 
     override fun initView() {
-        val task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this.onBackPressedDispatcher.addCallback(this, callback)
+        task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("user_task", UserTask::class.java)
         } else {
             intent.getParcelableExtra<UserTask>("user_task")
@@ -49,7 +55,8 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
                     editTaskTitle.text = getString(R.string.edit_task_title)
                     taskEdit.setText(task!!.taskTitle)
                     finishEditBtn.text = getString(R.string.edit_btn)
-                    dateEdit.text = task.date.toString()
+                    dateEdit.text = DATE_FORMATTER.format(task!!.date)
+                    calendar.time = task!!.date
                 }
             }
             finishEditBtn.setOnClickListener {
@@ -57,35 +64,35 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
                 val taskDate = dateEdit.text
                 if (taskContent.isNullOrBlank().not() && taskDate.isNullOrBlank().not()) {
                     val intent = Intent(this@EditTaskActivity, TaskActivity::class.java)
-                    if (task != null) {
-                        intent.putExtra(
-                            "user_task",
-                            UserTask(
-                                task.taskId,
-                                taskContent.toString(),
-                                calendar.time,
-                                task.isDone
-                            )
-                        )
-
+                    task = UserTask(
+                        task!!.taskId,
+                        taskContent.toString(),
+                        calendar.time,
+                        task!!.isDone
+                    )
+                    if (type == "edit") {
+                        intent.putExtra("user_task", task)
+                        setResult(1, intent)
                     } else {
                         intent.putExtra(
-                            "user_task",
-                            UserTask(1, taskContent.toString(), calendar.time, false)
+                            "user_task", task
                         )
+                        setResult(0, intent)
                     }
-                    setResult(0, intent)
                     finish()
                 }
             }
             dateEdit.setOnClickListener {
-                chooseTaskDate()
+                val dialog = DateDialog(calendar)
+                dialog.show(supportFragmentManager, "date_dialog")
+                //chooseTaskDate()
             }
 
         }
     }
 
     private fun chooseTaskDate() {
+        /*
         val dialog = DatePickerDialog(
             this,
             android.R.style.Theme_Material_Light_Dialog,
@@ -115,11 +122,14 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
             .setTextColor(color)
         dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE)
             .setTextColor(color)
+
+         */
     }
+
 
     companion object {
         private val DATE_FORMATTER =
-            SimpleDateFormat(TaskApplication.getString(R.string.task_format), Locale.ENGLISH)
+            SimpleDateFormat(TaskApplication.getString(R.string.full_date_format), Locale.ENGLISH)
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
@@ -138,4 +148,10 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
         }
         return super.dispatchTouchEvent(event)
     }
+
+    override fun sendResult(date: Calendar) {
+        calendar = date
+        binding.dateEdit.text = DATE_FORMATTER.format(calendar.time)
+    }
+
 }

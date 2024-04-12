@@ -23,7 +23,7 @@ class TaskViewModelImpl @Inject constructor() : TaskViewModel, BaseViewModel() {
 
     override fun removeTask(task: UserTask) {
         viewModelScope.launch {
-            _taskList.emit(_taskList.value - task)
+            _taskList.emit(_taskList.value - _taskList.value.find { it.taskId == task.taskId }!!)
         }
     }
 

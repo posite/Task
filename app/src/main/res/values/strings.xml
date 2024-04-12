@@ -8,9 +8,16 @@
     <string name="todo_title">TODO LIST</string>
     <string name="task_hint">Task</string>
     <string name="date_hint">Date</string>
-    <string name="task_format">"yyyy MM/dd hh:mm a"</string>
+    <string name="full_date_format">"yyyy MM/dd hh:mm a"</string>
+    <string name="date_format">"yyyy MM/dd"</string>
+    <string name="time_format">"hh:mm a"</string>
     <string name="add_task_title">ADD TASK</string>
     <string name="add_btn">ADD</string>
     <string name="edit_task_title">EDIT TASK</string>
     <string name="edit_btn">EDIT</string>
+    <string name="choose_date">날짜 선택</string>
+    <string name="choose_date_hint">날짜</string>
+    <string name="choose_time">시간 선택</string>
+    <string name="choose_time_hint">시간</string>
+    <string name="finish_input_date">확인</string>
 </resources>

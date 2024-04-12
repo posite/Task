@@ -13,7 +13,11 @@ import com.posite.task.databinding.ItemTaskBinding
 import com.posite.task.presentation.todo.model.UserTask
 import java.util.Locale
 
-class TaskListAdapter(val editTask: (UserTask) -> Unit, val removeTask: (UserTask) -> Unit) :
+class TaskListAdapter(
+    val editTask: (UserTask) -> Unit,
+    val removeTask: (UserTask) -> Unit,
+    val addTask: (UserTask) -> Unit
+) :
     ListAdapter<UserTask, TaskListAdapter.ItemViewHolder>(differ) {
 
     inner class ItemViewHolder(
@@ -59,6 +63,6 @@ class TaskListAdapter(val editTask: (UserTask) -> Unit, val removeTask: (UserTas
         }
 
         private val DATE_FORMATTER =
-            SimpleDateFormat(TaskApplication.getString(R.string.task_format), Locale.ENGLISH)
+            SimpleDateFormat(TaskApplication.getString(R.string.full_date_format), Locale.ENGLISH)
     }
 }

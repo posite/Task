@@ -40,25 +40,34 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
         }, removeTask = {
             viewModel.removeTask(it)
 
+        }, addTask = {
+            viewModel.addTask(it)
+
         })
     }
 
     private val activityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == 0) {
-                val taskIntent = it.data
-                try {
-                    val userTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        taskIntent!!.getParcelableExtra("user_task", UserTask::class.java)
-                    } else {
-                        taskIntent!!.getParcelableExtra<UserTask>("user_task")
-                    }
+            val taskIntent = it.data
+            try {
+                val userTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    taskIntent!!.getParcelableExtra("user_task", UserTask::class.java)
+                } else {
+                    taskIntent!!.getParcelableExtra<UserTask>("user_task")
+                }
+                if (it.resultCode == 0) {
                     userTask?.let { task ->
                         viewModel.addTask(task)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                } else if (it.resultCode == 1) {
+                    userTask?.let { task ->
+                        taskAdapter.removeTask(userTask)
+                        viewModel.addTask(task)
+                    }
                 }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
 
@@ -69,7 +78,7 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
         binding.taskRv.adapter = taskAdapter
         binding.taskRv.layoutManager = LinearLayoutManager(this)
 
-        val itemTouchHelper = ItemTouchHelper(SwipeCallback(this, taskAdapter))
+        val itemTouchHelper = ItemTouchHelper(SwipeCallback(this, binding.taskRv, taskAdapter))
         itemTouchHelper.attachToRecyclerView(binding.taskRv)
 
         binding.addBtn.setOnClickListener {
@@ -77,10 +86,13 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
             if (taskAdapter.itemCount != 0) {
                 intent.putExtra(
                     "user_task",
-                    UserTask(taskAdapter.lastId() + 1, "", Date(), false)
+                    UserTask(taskAdapter.lastId() + 1L, "", Date(), false)
                 )
             } else {
-                intent.putExtra("user_task", UserTask(1, "", Date(), false))
+                intent.putExtra(
+                    "user_task",
+                    UserTask(1, "", Date(), false)
+                )
             }
             intent.putExtra("edit_type", EDIT_TYPE_ADD)
             activityResultLauncher.launch(intent)
