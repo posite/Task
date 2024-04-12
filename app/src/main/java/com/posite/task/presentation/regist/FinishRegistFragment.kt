@@ -1,16 +1,19 @@
 package com.posite.task.presentation.regist
 
 import android.content.Intent
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.posite.task.R
 import com.posite.task.databinding.FragmentFinishRegistBinding
 import com.posite.task.presentation.base.BaseFragment
+import com.posite.task.presentation.regist.vm.RegistUserViewModelImpl
 import com.posite.task.presentation.todo.TaskActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class FinishRegistFragment :
     BaseFragment<FragmentFinishRegistBinding>(R.layout.fragment_finish_regist) {
+    private val finishViewModel by viewModels<RegistUserViewModelImpl>()
     override fun initObserver() {
 
     }
@@ -24,6 +27,7 @@ class FinishRegistFragment :
             userBirthday.text = userInfo.birthday
             profileImage.setImageBitmap(userInfo.profile)
             finishRegistBtn.setOnClickListener {
+                finishViewModel.saveUserInfo(userInfo)
                 val intent = Intent(requireContext(), TaskActivity::class.java)
                 intent.putExtra("userInfo", userInfo)
                 startActivity(intent)
@@ -31,7 +35,5 @@ class FinishRegistFragment :
             }
         }
     }
-
-    //fragment에서 뒤로가기 버튼 눌렀을 때
 
 }

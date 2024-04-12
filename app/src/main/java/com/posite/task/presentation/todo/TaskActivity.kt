@@ -83,7 +83,6 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
 
     override fun initView() {
         binding.userProfile.clipToOutline = true
-        setProfile()
         binding.taskRv.adapter = taskAdapter
         binding.taskRv.layoutManager = LinearLayoutManager(this)
         itemTouchHelper.attachToRecyclerView(binding.taskRv)
@@ -99,6 +98,11 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        setProfile()
+    }
+
     private fun setProfile() {
         val userInfo: UserInfo? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("userInfo", UserInfo::class.java)
@@ -106,9 +110,14 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
             intent.getParcelableExtra<UserInfo>("userInfo")
         }
 
-        userInfo?.let {
-            binding.userProfile.setImageBitmap(it.profile)
+        Log.d("userInfo", userInfo.toString())
+        if (userInfo != null) {
+            binding.userProfile.setImageBitmap(userInfo.profile)
+        } else {
+            viewModel.getUserInfo()
         }
+
+
     }
 
     override fun initObserver() {
@@ -116,6 +125,14 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.taskList.collect {
                     taskAdapter.submitList(it.sortedBy { task -> task.date })
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.userInfo.collect {
+                    binding.userProfile.setImageBitmap(it.profile)
                 }
             }
         }

@@ -8,5 +8,5 @@ import kotlinx.parcelize.Parcelize
 data class UserInfo(
     val name: String,
     val birthday: String,
-    val profile: Bitmap
+    val profile: Bitmap?
 ) : Parcelable

@@ -3,6 +3,7 @@ package com.posite.task.presentation.regist
 import android.Manifest
 import android.app.DatePickerDialog
 import android.content.ContentValues
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
@@ -13,13 +14,18 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.posite.task.R
 import com.posite.task.databinding.FragmentRegistBinding
 import com.posite.task.presentation.base.BaseFragment
 import com.posite.task.presentation.regist.model.UserInfo
 import com.posite.task.presentation.regist.vm.RegistUserViewModelImpl
+import com.posite.task.presentation.todo.TaskActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Calendar
 import java.util.Date
@@ -76,6 +82,7 @@ class RegistFragment :
 
     override fun onResume() {
         super.onResume()
+        viewModel.checkRegisted()
         pictureBitmap?.let {
             binding.profileImageFrame.setImageBitmap(it)
             binding.profileImageFrame.setPadding(0, 0, 0, 0)
@@ -83,7 +90,17 @@ class RegistFragment :
     }
 
     override fun initObserver() {
-
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isRegisted.collect {
+                    if (it) {
+                        val intent = Intent(requireContext(), TaskActivity::class.java)
+                        startActivity(intent)
+                        requireActivity().finish()
+                    }
+                }
+            }
+        }
     }
 
     override fun initView() {
