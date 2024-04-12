@@ -78,18 +78,15 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
         if (taskContent.isNullOrBlank().not() && taskDate.isNullOrBlank().not()) {
             val intent = Intent(this@EditTaskActivity, TaskActivity::class.java)
             task = UserTask(
-                task!!.taskId,
-                taskContent.toString(),
-                calendar.time,
-                task!!.isDone
+                taskTitle = taskContent.toString(),
+                date = calendar.time,
+                isDone = task!!.isDone
             )
             if (type == "edit") {
                 intent.putExtra("user_task", task)
                 setResult(1, intent)
             } else {
-                intent.putExtra(
-                    "user_task", task
-                )
+                intent.putExtra("user_task", task)
                 setResult(0, intent)
             }
             finish()

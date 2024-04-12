@@ -19,11 +19,14 @@ object DBModule {
     @Provides
     fun provideAppDatabase(
         @ApplicationContext context: Context
-    ): TodoDB = Room
-        .databaseBuilder(context, TodoDB::class.java, "kim_ready.db")
+    ): TodoDB = Room.databaseBuilder(
+        context,
+        TodoDB::class.java,
+        "todo_db"
+    ).fallbackToDestructiveMigration()
         .build()
 
     @Singleton
     @Provides
-    fun provideTodoDao(appDatabase: TodoDB): TodoDao = appDatabase.todoDao()
+    fun provideTodoDao(todoDB: TodoDB): TodoDao = todoDB.todoDao()
 }

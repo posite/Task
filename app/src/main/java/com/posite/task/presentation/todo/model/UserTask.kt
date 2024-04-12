@@ -10,8 +10,8 @@ import java.util.Date
 @Parcelize
 @Entity
 data class UserTask(
-    @PrimaryKey
-    val taskId: Long,
+    @PrimaryKey(autoGenerate = true)
+    val taskId: Long = 0L,
     val taskTitle: String,
     val date: Date,
     val isDone: Boolean

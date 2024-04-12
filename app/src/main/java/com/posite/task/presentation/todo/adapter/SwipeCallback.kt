@@ -93,6 +93,14 @@ class SwipeCallback(
         snackbar.show()
     }
 
+    fun undoSwipe(task: UserTask) {
+        recentlySwipedItem?.let { (index, item) ->
+            adapter.addTask(task)
+            recyclerView.scrollToPosition(index)
+            recentlySwipedItem = null
+        }
+    }
+
     fun undoSwipe() {
         recentlySwipedItem?.let { (index, item) ->
             adapter.addTask(item)

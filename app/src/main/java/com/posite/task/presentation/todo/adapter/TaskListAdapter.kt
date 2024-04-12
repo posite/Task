@@ -44,7 +44,6 @@ class TaskListAdapter(
     }
 
     fun onItemMoved(index: Int): UserTask = getItem(index)
-    fun lastId(): Long = currentList.maxBy { it.taskId }.taskId
 
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {

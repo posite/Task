@@ -43,7 +43,6 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
 
         }, addTask = {
             viewModel.addTask(it)
-
         })
     }
     private val swipeCallback by lazy {
@@ -69,10 +68,10 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
                     }
                 } else if (it.resultCode == 1) {
                     userTask?.let { task ->
-                        viewModel.addTask(task)
+                        viewModel.updateTask(task)
+                        swipeCallback.undoSwipe(task)
                     }
                 } else if (it.resultCode == 2) {
-
                     swipeCallback.undoSwipe()
                 }
 
@@ -89,19 +88,11 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
         binding.taskRv.layoutManager = LinearLayoutManager(this)
         itemTouchHelper.attachToRecyclerView(binding.taskRv)
 
+        viewModel.getAllTask()
+
         binding.addBtn.setOnClickListener {
             val intent = Intent(this, EditTaskActivity::class.java)
-            if (taskAdapter.itemCount != 0) {
-                intent.putExtra(
-                    "user_task",
-                    UserTask(taskAdapter.lastId() + 1L, "", Date(), false)
-                )
-            } else {
-                intent.putExtra(
-                    "user_task",
-                    UserTask(1, "", Date(), false)
-                )
-            }
+            intent.putExtra("user_task", UserTask(taskTitle = "", date = Date(), isDone = false))
             intent.putExtra("edit_type", EDIT_TYPE_ADD)
             activityResultLauncher.launch(intent)
         }

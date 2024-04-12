@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.StateFlow
 interface TaskViewModel {
     val taskList: StateFlow<List<UserTask>>
 
+    fun getAllTask()
     fun addTask(task: UserTask)
+    fun updateTask(task: UserTask)
     fun removeTask(task: UserTask)
+
 }
