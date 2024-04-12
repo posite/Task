@@ -24,10 +24,11 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
     DateDialog.OnInputListener {
     private var calendar = Calendar.getInstance()
     private var task: UserTask? = null
+    private var type: String? = null
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-
+            backpressLoadData()
         }
     }
 
@@ -42,7 +43,7 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
         } else {
             intent.getParcelableExtra<UserTask>("user_task")
         }
-        val type = intent.getStringExtra("edit_type")
+        type = intent.getStringExtra("edit_type")
 
         with(binding) {
             when (type) {
@@ -60,27 +61,7 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
                 }
             }
             finishEditBtn.setOnClickListener {
-                val taskContent = taskEdit.text
-                val taskDate = dateEdit.text
-                if (taskContent.isNullOrBlank().not() && taskDate.isNullOrBlank().not()) {
-                    val intent = Intent(this@EditTaskActivity, TaskActivity::class.java)
-                    task = UserTask(
-                        task!!.taskId,
-                        taskContent.toString(),
-                        calendar.time,
-                        task!!.isDone
-                    )
-                    if (type == "edit") {
-                        intent.putExtra("user_task", task)
-                        setResult(1, intent)
-                    } else {
-                        intent.putExtra(
-                            "user_task", task
-                        )
-                        setResult(0, intent)
-                    }
-                    finish()
-                }
+                loadData()
             }
             dateEdit.setOnClickListener {
                 val dialog = DateDialog(calendar)
@@ -89,6 +70,41 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
             }
 
         }
+    }
+
+    private fun loadData() {
+        val taskContent = binding.taskEdit.text
+        val taskDate = binding.dateEdit.text
+        if (taskContent.isNullOrBlank().not() && taskDate.isNullOrBlank().not()) {
+            val intent = Intent(this@EditTaskActivity, TaskActivity::class.java)
+            task = UserTask(
+                task!!.taskId,
+                taskContent.toString(),
+                calendar.time,
+                task!!.isDone
+            )
+            if (type == "edit") {
+                intent.putExtra("user_task", task)
+                setResult(1, intent)
+            } else {
+                intent.putExtra(
+                    "user_task", task
+                )
+                setResult(0, intent)
+            }
+            finish()
+        }
+    }
+
+    private fun backpressLoadData() {
+        val intent = Intent(this@EditTaskActivity, TaskActivity::class.java)
+        if (type == "edit") {
+            intent.putExtra("user_task", task)
+            setResult(2, intent)
+        } else {
+            setResult(3, intent)
+        }
+        finish()
     }
 
     private fun chooseTaskDate() {

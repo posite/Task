@@ -92,4 +92,12 @@ class SwipeCallback(
         snackbar.setActionTextColor(context.getColor(R.color.highlight))
         snackbar.show()
     }
+
+    fun undoSwipe() {
+        recentlySwipedItem?.let { (index, item) ->
+            adapter.addTask(item)
+            recyclerView.scrollToPosition(index)
+            recentlySwipedItem = null
+        }
+    }
 }

@@ -45,6 +45,12 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
 
         })
     }
+    private val swipeCallback by lazy {
+        SwipeCallback(this, binding.taskRv, taskAdapter)
+    }
+    private val itemTouchHelper by lazy {
+        ItemTouchHelper(swipeCallback)
+    }
 
     private val activityResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -64,6 +70,8 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
                         taskAdapter.removeTask(userTask)
                         viewModel.addTask(task)
                     }
+                } else if (it.resultCode == 2) {
+                    swipeCallback.undoSwipe()
                 }
 
             } catch (e: Exception) {
@@ -77,8 +85,6 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
         setProfile()
         binding.taskRv.adapter = taskAdapter
         binding.taskRv.layoutManager = LinearLayoutManager(this)
-
-        val itemTouchHelper = ItemTouchHelper(SwipeCallback(this, binding.taskRv, taskAdapter))
         itemTouchHelper.attachToRecyclerView(binding.taskRv)
 
         binding.addBtn.setOnClickListener {
