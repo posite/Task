@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.provider.MediaStore
+import android.text.InputFilter
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,11 +25,13 @@ import com.posite.task.presentation.base.BaseFragment
 import com.posite.task.presentation.regist.model.UserInfo
 import com.posite.task.presentation.regist.vm.RegistUserViewModelImpl
 import com.posite.task.presentation.todo.TaskActivity
+import com.posite.task.util.BitmapConverter.convertToGrayscale
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Calendar
 import java.util.Date
+import java.util.regex.Pattern
 
 @AndroidEntryPoint
 class RegistFragment :
@@ -40,11 +43,14 @@ class RegistFragment :
     private var month = calendar.get(Calendar.MONTH)
     private var day = calendar.get(Calendar.DAY_OF_MONTH)
 
+    private var pictureUri: Uri? = null
+    private var pictureBitmap: Bitmap? = null
     private val permissionList = arrayOf(
         Manifest.permission.CAMERA,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
+
     private val requestMultiplePermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
             results.forEach {
@@ -59,21 +65,19 @@ class RegistFragment :
         registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             Log.d("bitmap", bitmap.toString())
             bitmap?.let {
-                pictureBitmap = it
+                pictureBitmap = convertToGrayscale(it)
                 binding.profileImageFrame.setImageBitmap(bitmap)
                 binding.profileImageFrame.setPadding(0, 0, 0, 0)
             }
         }
 
-    private var pictureUri: Uri? = null
-    private var pictureBitmap: Bitmap? = null
 
     //uri 저장
     private val getTakePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) {
         if (it) {
             pictureUri?.let {
                 //binding.profileImageFrame.setImageURI(pictureUri)
-                pictureBitmap = uriToBitmap(pictureUri!!)
+                pictureBitmap = convertToGrayscale(uriToBitmap(pictureUri!!)!!)
                 binding.profileImageFrame.setImageBitmap(pictureBitmap)
                 binding.profileImageFrame.setPadding(0, 0, 0, 0)
             }
@@ -104,6 +108,12 @@ class RegistFragment :
     }
 
     override fun initView() {
+        binding.nameEdit.filters = arrayOf(InputFilter { source, start, end, dest, dstart, dend ->
+            val ps = Pattern.compile(getString(R.string.input_format))
+            if (!ps.matcher(source).matches()) {
+                ""
+            } else source
+        })
         binding.profileImageFrame.clipToOutline = true
         Log.d("name", binding.nameEdit.text.toString())
         requestMultiplePermission.launch(permissionList)
@@ -130,8 +140,7 @@ class RegistFragment :
 
         binding.profileImageFrame.setOnClickListener {
             pictureUri = createImageFile()
-            getTakePicturePreview.launch(null)
-            //getTakePicture.launch(pictureUri)
+            getTakePicture.launch(null)
         }
     }
 
@@ -218,4 +227,9 @@ class RegistFragment :
         // fragment가 detach되면 observe를 중단하도록 합니다.
         userInfoObserved = true
     }
+
+    companion object {
+        private const val REQUEST_IMAGE_CAPTURE = 1
+    }
+
 }

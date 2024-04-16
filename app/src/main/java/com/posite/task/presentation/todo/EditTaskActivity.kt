@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Rect
 import android.icu.text.SimpleDateFormat
 import android.os.Build
+import android.text.InputFilter
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
@@ -18,6 +19,7 @@ import com.posite.task.presentation.todo.model.UserTask
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 import java.util.Locale
+import java.util.regex.Pattern
 
 @AndroidEntryPoint
 class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity_edit_task),
@@ -37,6 +39,12 @@ class EditTaskActivity : BaseActivity<ActivityEditTaskBinding>(R.layout.activity
     }
 
     override fun initView() {
+        binding.taskEdit.filters = arrayOf(InputFilter { source, start, end, dest, dstart, dend ->
+            val ps = Pattern.compile(getString(R.string.input_format))
+            if (!ps.matcher(source).matches()) {
+                ""
+            } else source
+        })
         this.onBackPressedDispatcher.addCallback(this, callback)
         task = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("user_task", UserTask::class.java)
