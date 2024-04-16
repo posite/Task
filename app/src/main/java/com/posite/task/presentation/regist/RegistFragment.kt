@@ -3,34 +3,36 @@ package com.posite.task.presentation.regist
 import android.Manifest
 import android.app.DatePickerDialog
 import android.content.ContentValues
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.provider.MediaStore
 import android.text.InputFilter
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.posite.task.R
 import com.posite.task.databinding.FragmentRegistBinding
 import com.posite.task.presentation.base.BaseFragment
 import com.posite.task.presentation.regist.model.UserInfo
 import com.posite.task.presentation.regist.vm.RegistUserViewModelImpl
-import com.posite.task.presentation.todo.TaskActivity
 import com.posite.task.util.BitmapConverter.convertToGrayscale
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import java.io.File
 import java.io.IOException
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.regex.Pattern
 
 @AndroidEntryPoint
@@ -42,6 +44,9 @@ class RegistFragment :
     private var year = calendar.get(Calendar.YEAR)
     private var month = calendar.get(Calendar.MONTH)
     private var day = calendar.get(Calendar.DAY_OF_MONTH)
+    private var imageCapture: ImageCapture? = null
+    private lateinit var outputDirectory: File
+    private lateinit var cameraExecutor: ExecutorService
 
     private var pictureUri: Uri? = null
     private var pictureBitmap: Bitmap? = null
@@ -60,33 +65,9 @@ class RegistFragment :
             }
         }
 
-    //bitmap으로 바로 넣기
-    private val getTakePicturePreview =
-        registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-            Log.d("bitmap", bitmap.toString())
-            bitmap?.let {
-                pictureBitmap = convertToGrayscale(it)
-                binding.profileImageFrame.setImageBitmap(bitmap)
-                binding.profileImageFrame.setPadding(0, 0, 0, 0)
-            }
-        }
-
-
-    //uri 저장
-    private val getTakePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) {
-        if (it) {
-            pictureUri?.let {
-                //binding.profileImageFrame.setImageURI(pictureUri)
-                pictureBitmap = convertToGrayscale(uriToBitmap(pictureUri!!)!!)
-                binding.profileImageFrame.setImageBitmap(pictureBitmap)
-                binding.profileImageFrame.setPadding(0, 0, 0, 0)
-            }
-        }
-    }
 
     override fun onResume() {
         super.onResume()
-        viewModel.checkRegisted()
         pictureBitmap?.let {
             binding.profileImageFrame.setImageBitmap(it)
             binding.profileImageFrame.setPadding(0, 0, 0, 0)
@@ -94,17 +75,7 @@ class RegistFragment :
     }
 
     override fun initObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isRegisted.collect {
-                    if (it) {
-                        val intent = Intent(requireContext(), TaskActivity::class.java)
-                        startActivity(intent)
-                        requireActivity().finish()
-                    }
-                }
-            }
-        }
+
     }
 
     override fun initView() {
@@ -114,8 +85,10 @@ class RegistFragment :
                 ""
             } else source
         })
+        outputDirectory = getOutputDirectory()
+        startCamera()
+        cameraExecutor = Executors.newSingleThreadExecutor()
         binding.profileImageFrame.clipToOutline = true
-        Log.d("name", binding.nameEdit.text.toString())
         requestMultiplePermission.launch(permissionList)
         binding.viewModel = viewModel
         binding.birthdayEdit.setOnClickListener {
@@ -140,8 +113,77 @@ class RegistFragment :
 
         binding.profileImageFrame.setOnClickListener {
             pictureUri = createImageFile()
-            getTakePicture.launch(null)
+            takePhoto()
         }
+    }
+
+    private fun takePhoto() {
+        val imageCapture = imageCapture ?: return
+
+        val photoFile = File(
+            outputDirectory,
+            SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+                .format(System.currentTimeMillis()) + ".jpg"
+        )
+
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+        imageCapture.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(requireContext()),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onError(exc: ImageCaptureException) {
+                    exc.printStackTrace()
+                }
+
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
+                    val img =
+                        convertToGrayscale(uriToBitmap(savedUri)!!).rotate(270f).reverse()
+                    pictureBitmap = img
+                    binding.profileImageFrame.setImageBitmap(img)
+                    binding.profileImageFrame.setPadding(0, 0, 0, 0)
+                }
+            })
+    }
+
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+
+
+
+            imageCapture = ImageCapture.Builder()
+                .setCameraSelector(CameraSelector.DEFAULT_FRONT_CAMERA)
+                .build()
+
+            try {
+                cameraProvider.unbindAll()
+
+                cameraProvider.bindToLifecycle(
+                    this, CameraSelector.DEFAULT_FRONT_CAMERA, imageCapture
+                )
+
+            } catch (exc: Exception) {
+                exc.printStackTrace()
+            }
+
+        }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
+    private fun getOutputDirectory(): File {
+        val mediaDir = requireActivity().externalMediaDirs.firstOrNull()?.let {
+            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists())
+            mediaDir else requireActivity().filesDir
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
     }
 
     private fun chooseBirthday() {
@@ -230,6 +272,28 @@ class RegistFragment :
 
     companion object {
         private const val REQUEST_IMAGE_CAPTURE = 1
+        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private fun Bitmap.rotate(degrees: Float): Bitmap =
+            Bitmap.createBitmap(
+                this,
+                0,
+                0,
+                width,
+                height,
+                Matrix().apply { postRotate(degrees) },
+                true
+            )
+
+        private fun Bitmap.reverse(): Bitmap =
+            Bitmap.createBitmap(
+                this,
+                0,
+                0,
+                width,
+                height,
+                Matrix().apply { setScale(-1f, 1f) },
+                false
+            )
     }
 
 }

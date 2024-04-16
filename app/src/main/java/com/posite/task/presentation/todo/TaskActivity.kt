@@ -19,12 +19,12 @@ import com.google.android.material.textfield.TextInputEditText
 import com.posite.task.R
 import com.posite.task.databinding.ActivityTaskBinding
 import com.posite.task.presentation.base.BaseActivity
-import com.posite.task.presentation.regist.model.UserInfo
 import com.posite.task.presentation.todo.adapter.SwipeCallback
 import com.posite.task.presentation.todo.adapter.TaskListAdapter
 import com.posite.task.presentation.todo.model.UserTask
 import com.posite.task.presentation.todo.vm.TaskViewModel
 import com.posite.task.presentation.todo.vm.TaskViewModelImpl
+import com.posite.task.util.BitmapConverter.stringToBitmap
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -100,24 +100,7 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
 
     override fun onResume() {
         super.onResume()
-        setProfile()
-    }
-
-    private fun setProfile() {
-        val userInfo: UserInfo? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("userInfo", UserInfo::class.java)
-        } else {
-            intent.getParcelableExtra<UserInfo>("userInfo")
-        }
-
-        Log.d("userInfo", userInfo.toString())
-        if (userInfo != null) {
-            binding.userProfile.setImageBitmap(userInfo.profile)
-        } else {
-            viewModel.getUserInfo()
-        }
-
-
+        viewModel.getUserInfo()
     }
 
     override fun initObserver() {
@@ -131,8 +114,8 @@ class TaskActivity : BaseActivity<ActivityTaskBinding>(R.layout.activity_task) {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userInfo.collect {
-                    binding.userProfile.setImageBitmap(it.profile)
+                viewModel.profile.collect {
+                    binding.userProfile.setImageBitmap(stringToBitmap(it))
                 }
             }
         }

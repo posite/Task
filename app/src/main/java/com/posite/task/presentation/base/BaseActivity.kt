@@ -19,8 +19,12 @@ abstract class BaseActivity<V : ViewDataBinding>(@LayoutRes val layoutResource: 
         binding.lifecycleOwner = this
         setContentView(binding.root)
         initView()
-        initObserver()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initObserver()
     }
 
 }

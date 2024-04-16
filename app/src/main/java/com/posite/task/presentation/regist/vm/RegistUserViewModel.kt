@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 interface RegistUserViewModel {
     val userName: StateFlow<String>
     val userBirthday: StateFlow<String>
-    val isRegisted: SharedFlow<Boolean>
-
-    fun checkRegisted()
+    val finishRegist: SharedFlow<Boolean>
+    val saveFinshed: SharedFlow<Boolean>
 
     fun saveUserInfo(userInfo: UserInfo)
+    fun registUser()
 }

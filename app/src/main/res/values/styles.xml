@@ -24,6 +24,10 @@
         <item name="android:textSize">18dp</item>
     </style>
 
+    <style name="TextSubTitle.02">
+        <item name="android:textSize">36dp</item>
+    </style>
+
     <style name="TextBodyMedium">
         <item name="fontFamily">@font/roboto_medium</item>
         <item name="fontWeight">500</item>

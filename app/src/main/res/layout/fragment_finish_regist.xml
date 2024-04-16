@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.posite.task.presentation.regist.vm.RegistUserViewModelImpl" />
+            type="com.posite.task.presentation.regist.vm.RegistUserViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,6 +65,7 @@
             android:background="@drawable/rectangle_stroke_2_corner_32"
             android:backgroundTint="@color/highlight"
             android:gravity="center"
+            android:onClick="@{() -> viewModel.registUser()}"
             android:text="@string/finish_regist_btn"
             android:textAppearance="@style/TextBodyRegular.02"
             android:textColor="@color/white"
